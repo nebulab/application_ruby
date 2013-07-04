@@ -170,12 +170,18 @@ end
 def create_database_yml
   host = new_resource.find_database_server(new_resource.database_master_role)
 
-  template "#{new_resource.path}/shared/database.yml" do
+  directory "#{new_resource.path}/shared/config" do
+    owner new_resource.owner
+    group new_resource.group
+    mode '0755'
+  end
+
+  template "#{new_resource.path}/shared/config/database.yml" do
     source new_resource.database_template || "database.yml.erb"
     cookbook new_resource.database_template ? new_resource.cookbook_name.to_s : "application_ruby"
     owner new_resource.owner
     group new_resource.group
-    mode "644"
+    mode "600"
     variables(
       :host => host,
       :database => new_resource.database,
